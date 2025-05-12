@@ -1,0 +1,5 @@
+[server]
+headless = true
+
+[general]
+postInstall = "bash startup.sh"
