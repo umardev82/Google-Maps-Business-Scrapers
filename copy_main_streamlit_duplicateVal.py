@@ -444,14 +444,14 @@ async def scrape_business(search_term, total, existing_ids=None):
         page = await browser.new_page()
 
         try:
-            await page.goto("https://www.google.com/maps", timeout=1160000)
-            await page.wait_for_timeout(15000)
+            await page.goto("https://www.google.com/maps", timeout=11160000)
+            await page.wait_for_timeout(115000)
 
             await page.fill('//input[@id="searchboxinput"]', search_term)
-            await page.wait_for_timeout(113000)
+            await page.wait_for_timeout(1113000)
 
             await page.keyboard.press("Enter")
-            await page.wait_for_timeout(115000)
+            await page.wait_for_timeout(1115000)
 
             await page.hover(
                 '//a[contains(@href, "https://www.google.com/maps/place")]')
@@ -464,8 +464,8 @@ async def scrape_business(search_term, total, existing_ids=None):
             target_new_businesses = total
 
             while True:
-                await page.mouse.wheel(0, 110000)
-                await page.wait_for_timeout(12000)
+                await page.mouse.wheel(0, 1110000)
+                await page.wait_for_timeout(112000)
 
                 current_count = await page.locator(
                     '//a[contains(@href, "https://www.google.com/maps/place")]'
@@ -493,7 +493,7 @@ async def scrape_business(search_term, total, existing_ids=None):
                     
                 try:
                     await listing.click()
-                    await page.wait_for_timeout(3000)
+                    await page.wait_for_timeout(13000)
 
                     name_css_selector = 'h1.DUwDvf.lfPIob'
                     address_xpath = '//button[@data-item-id="address"]//div[contains(@class, "fontBodyMedium")]'
@@ -591,8 +591,8 @@ async def main():
     
     total_results = st.number_input("Enter number of new results to fetch",
                                   min_value=1,
-                                  max_value=100,
-                                  value=50)
+                                  max_value=10000,
+                                  value=100)
     
     # Create data store instance
     data_store = DataStore()
