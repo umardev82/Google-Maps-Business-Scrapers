@@ -264,7 +264,38 @@ import pytz
 import json
 import hashlib
 
-asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+import sys
+import asyncio
+
+# Use WindowsProactorEventLoopPolicy only on Windows
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
+# Ensure necessary system packages are installed
+os.system(
+    'apt-get update && apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libgbm1 libasound2 libpangocairo-1.0-0 libpango-1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 libdrm2'
+)
+
+# Install Playwright
+os.system('pip install playwright')
+
+# Install Playwright browsers
+os.system('playwright install')
+
+
+# Ensure Playwright browsers are installed
+async def install_playwright_browsers():
+    from playwright.__main__ import main as playwright_main
+    await asyncio.create_task(playwright_main(['install']))
+
+
+# asyncio.run(install_playwright_browsers())
+
+
+# Ensuring Playwright browsers are installed
+async def install_playwright_browsers():
+    from playwright.__main__ import main as playwright_main
+    await asyncio.create_task(playwright_main(['install']))
 
 # Set up logging
 logging.basicConfig(level=logging.INFO,
