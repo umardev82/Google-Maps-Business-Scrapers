@@ -575,7 +575,7 @@ async def scrape_business(search_term, total, existing_ids=None):
 
 async def main():
     st.image("https://nec-codes.s3.us-east-1.amazonaws.com/logo+_sk.png", width=100)
-    st.title("Google Maps Business Scraper with Data Store")
+    st.title("Google Maps Business Scraper For Electricians")
     
     # Initialize session state for persisting data between Streamlit reruns
     if 'data_loaded' not in st.session_state:
@@ -583,10 +583,15 @@ async def main():
         st.session_state.stored_data = None
         st.session_state.search_term = ""
     
-    search_term = st.text_input("Enter search term", key="search_input")
+    # Default search term is "electricians in"
+    location = st.text_input("Enter location (e.g., Pakistan, California, etc.)", key="location_input")
+    
+    # Combine the default search term with user's location input
+    search_term = f"electricians in {location}" if location else "electricians in"
+    
     total_results = st.number_input("Enter number of new results to fetch",
                                   min_value=1,
-                                  max_value=1000,
+                                  max_value=100,
                                   value=50)
     
     # Create data store instance
@@ -614,8 +619,8 @@ async def main():
             st.dataframe(st.session_state.stored_data.dataframe())
     
     if st.button("Scrape New Data"):
-        if not search_term:
-            st.error("Please enter a search term")
+        if not location:
+            st.error("Please enter a location")
         else:
             with st.spinner("Scraping data... This may take several minutes"):
                 # Get IDs of already scraped businesses to avoid duplicates
