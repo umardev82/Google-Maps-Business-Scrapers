@@ -511,19 +511,34 @@ async def main():
     st.image("https://nec-codes.s3.us-east-1.amazonaws.com/logo+_sk.png", width=100)
     st.title("Google Maps Business Scraper For Electricians")
     
-    # Initialize session state for persisting data between Streamlit reruns
+    # Initialize session state
     if 'data_loaded' not in st.session_state:
         st.session_state.data_loaded = False
         st.session_state.stored_data = None
         st.session_state.search_term = ""
         st.session_state.scraping_in_progress = False
     
-    # Default search term is "electricians in"
-    location = st.text_input("Enter location (e.g., Pakistan, California, etc.)", key="location_input")
+    # Create two input options: location or ZIP code
+    search_type = st.radio("Search by:", ["Location", "ZIP Code"])
     
-    # Combine the default search term with user's location input
-    search_term = f"electricians in {location}" if location else "electricians in"
+    search_term = "electricians"  # Default base term
     
+    if search_type == "Location":
+        location = st.text_input("Enter location (e.g., Pakistan, California, etc.)", 
+                               key="location_input")
+        if location:
+            search_term = f"electricians in {location}"
+    else:
+        zip_code = st.text_input("Enter ZIP code (e.g., 55401, 90210, etc.)",
+                               key="zip_input")
+        if zip_code:
+            # Simple validation for US ZIP codes (5 digits)
+            if not zip_code.isdigit() or len(zip_code) != 5:
+                st.warning("Please enter a valid 5-digit ZIP code")
+                return
+            search_term = f"electricians {zip_code}"
+    
+    # Rest of your main function remains the same but we'll modify the start button check
     col1, col2, col3 = st.columns(3)
     
     with col1:
@@ -538,7 +553,6 @@ async def main():
                                    min_value=100,
                                    max_value=5000,
                                    value=1000,
-                                   
                                    help="Fixed at 100 entries per batch as requested")
     
     with col3:
@@ -555,7 +569,7 @@ async def main():
         st.session_state.data_loaded = False
     
     # Load existing data for this search term
-    if search_term and not st.session_state.data_loaded:
+    if search_term != "electricians" and not st.session_state.data_loaded:  # Only if user entered something
         businesses = data_store.get_stored_businesses(search_term)
         if businesses:
             st.session_state.stored_data = BusinessList(business_list=businesses)
@@ -575,8 +589,9 @@ async def main():
         start_button = st.button("Start Scraping")
     
     if start_button:
-        if not location:
-            st.error("Please enter a location")
+        # Check if user has entered either location or ZIP code
+        if search_term == "electricians":
+            st.error("Please enter either a location or ZIP code")
         else:
             st.session_state.scraping_in_progress = True
             
@@ -590,7 +605,7 @@ async def main():
                 total_target=total_results, 
                 data_store=data_store,
                 auto_continue=auto_continue
-            )
+        )
             
             if not all_results.business_list:
                 st.warning("No businesses found or scraping encountered an error.")
